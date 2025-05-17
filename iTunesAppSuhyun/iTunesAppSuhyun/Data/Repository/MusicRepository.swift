@@ -21,7 +21,7 @@ final class MusicRepository: MusicRepositoryProtocol {
                     keyword: keyword,
                     country: country,
                     limit: limit,
-                    media: ITunesMediaType.music.media
+                    media: MediaType.music.media
                 )
 
             return transfrom(from: result.results)
@@ -35,20 +35,22 @@ final class MusicRepository: MusicRepositoryProtocol {
     }
 
     private func transfrom(from results: [MusicDTO]) -> [Music] {
-        let dateFormatter = ISO8601DateFormatter()
         return results.compactMap { (dto: MusicDTO) -> Music? in
-            guard let releaseDate = dateFormatter.date(from: dto.releaseDate) else {
-                return nil
-            }
-
-            return Music(
-                musicId: dto.musicId,
+            guard let date = Date(iso8601String: dto.releaseDate) else{ return nil }
+            let mediaInfo = MediaInfo(
+                type: .music,
+                id: dto.musicId,
                 title: dto.title,
                 artist: dto.artist,
-                album: dto.album,
                 imageURL: dto.imageURL,
-                releaseDate: releaseDate,
+                genre: dto.genre,
+                releaseDate: date,
                 durationInSeconds: dto.durationInMillis / 1000
+            )
+            return Music(
+                mediaInfo: mediaInfo,
+                album: dto.album,
+                previewURL: dto.previewURL
             )
         }
     }

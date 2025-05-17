@@ -36,9 +36,24 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         setNavigationBar()
         setDataSource()
+        bindView()
         bindViewModel()
-
         homeViewModel.action.onNext(.fetchMusic)
+    }
+
+    private func bindView() {
+        homeView.collectionView.rx.itemSelected
+            .throttle(.milliseconds(300), scheduler: MainScheduler.asyncInstance)
+            .bind {[weak self] indexPath in
+                guard let self,
+                      let item = self.dataSource?.itemIdentifier(for: indexPath) else {
+                    return
+                }
+
+                let detailVC = DetailViewController(info: DetailInfo(item.music))
+                detailVC.modalPresentationStyle = .fullScreen
+                self.present(detailVC, animated: true)
+            }.disposed(by: disposeBag)
     }
 
     private func setDataSource() {

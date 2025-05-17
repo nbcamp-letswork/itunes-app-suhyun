@@ -23,6 +23,7 @@ final class SearchResultView: UIView {
         tableView.showsVerticalScrollIndicator = false
         tableView.rowHeight = UIScreen.main.bounds.width * 1.5
         tableView.sectionHeaderHeight = 60
+        tableView.keyboardDismissMode = .onDrag
         tableView.register(SearchResultCell.self, forCellReuseIdentifier: SearchResultCell.id)
         return tableView
     }()
@@ -67,12 +68,13 @@ private extension SearchResultView {
     func setConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
-            make.directionalHorizontalEdges.equalToSuperview().inset(12)
+            make.leading.equalToSuperview().inset(12)
+            make.trailing.lessThanOrEqualToSuperview()
         }
 
         tableView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(12)
-            make.bottom.equalTo(safeAreaLayoutGuide)
+            make.bottom.equalToSuperview()
             make.directionalHorizontalEdges.equalToSuperview().inset(12)
         }
     }

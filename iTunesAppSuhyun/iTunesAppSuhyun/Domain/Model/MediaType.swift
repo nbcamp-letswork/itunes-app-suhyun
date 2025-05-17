@@ -1,5 +1,5 @@
 //
-//  ITunesMediaType.swift
+//  MediaType.swift
 //  iTunesAppSuhyun
 //
 //  Created by 이수현 on 5/13/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ITunesMediaType: String {
+enum MediaType: String {
     case music
     case movie
     case podcast

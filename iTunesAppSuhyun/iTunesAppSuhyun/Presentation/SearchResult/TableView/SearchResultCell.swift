@@ -73,10 +73,10 @@ final class SearchResultCell: UITableViewCell {
     }
 
     func configure(with searchResult: SearchResult, index: Int) {
-        titleLabel.text = searchResult.title
-        genreLabel.text = searchResult.genre
-        releaseDateLabel.text = searchResult.releaseDate.toReleaseDateFormmat()
-        posterImageView.setImage(with: searchResult.imageURL, toSize: 600)
+        titleLabel.text = searchResult.mediaInfo.title
+        genreLabel.text = searchResult.mediaInfo.genre
+        releaseDateLabel.text = searchResult.mediaInfo.releaseDate.toReleaseDateFormmat()
+        posterImageView.setImage(with: searchResult.mediaInfo.imageURL, toSize: 600)
         self.contentView.backgroundColor = colors[index % colors.count]
     }
 }

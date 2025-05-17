@@ -9,14 +9,14 @@
 import Foundation
 
 final class MockItunesNetwork: ITunesNetworkProtocol {
-    func fetchMusic(keyword: String, country: String, limit: Int) async throws -> APIResponse<MusicDTO> {
-      return mockData()
+    func fetchData<T: Decodable>(keyword: String, country: String, limit: Int, media: String) async throws -> APIResponse<T> {
+      return mockData() as! APIResponse<T>
     }
 }
 
 extension MockItunesNetwork {
     func mockData() -> APIResponse<MusicDTO> {
-        return APIResponse(
+        return APIResponse<MusicDTO>(
             resultCount: 1,
             results: [
                 MusicDTO(
@@ -24,8 +24,9 @@ extension MockItunesNetwork {
                     title: "mockTitle",
                     artist:  "mockArtist",
                     album:  "mockAlbum",
+                    genre: "mockGenre",
                     imageURL:  "mockImageURL",
-                    releaseDate:  "mockReleaseDate",
+                    releaseDate:  "2023-05-01T12:00:00Z",
                     durationInMillis: 0
                 )
             ]

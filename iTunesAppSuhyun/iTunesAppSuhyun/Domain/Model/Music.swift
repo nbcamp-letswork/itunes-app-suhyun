@@ -8,11 +8,7 @@
 import Foundation
 
 struct Music {
-    let musicId: Int
-    let title: String
-    let artist: String
+    let mediaInfo: MediaInfo
     let album: String
-    let imageURL: String
-    let releaseDate: Date
-    let durationInSeconds: Int
+    let previewURL: String
 }

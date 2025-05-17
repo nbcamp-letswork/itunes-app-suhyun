@@ -8,13 +8,9 @@
 import Foundation
 
 struct Movie {
-    let movieId: Int
-    let title: String
-    let director: String
-    let posterURL: String
-    let price: Double
-    let genre: String
+    let mediaInfo: MediaInfo
     let contentAdvisoryRating: String
+    let price: Double
     let description: String
-    let releaseDate: Date
+    let previewURL: String
 }

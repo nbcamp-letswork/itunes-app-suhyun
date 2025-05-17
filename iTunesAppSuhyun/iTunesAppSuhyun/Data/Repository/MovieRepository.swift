@@ -20,7 +20,7 @@ final class MovieRepository: MovieRepositoryProtocol {
                 keyword: keyword,
                 country: country,
                 limit: limit,
-                media: ITunesMediaType.movie.media
+                media: MediaType.movie.media
             )
             return transfrom(from: result.results)
         } catch {
@@ -33,22 +33,24 @@ final class MovieRepository: MovieRepositoryProtocol {
     }
 
     private func transfrom(from results: [MovieDTO]) -> [Movie] {
-        let dateFormatter = ISO8601DateFormatter()
         return results.compactMap { (dto: MovieDTO) -> Movie? in
-            guard let releaseDate = dateFormatter.date(from: dto.releaseDate) else {
-                return nil
-            }
-
-            return Movie(
-                movieId: dto.movieId,
+            guard let date = Date(iso8601String: dto.releaseDate) else{ return nil }
+            let mediaInfo = MediaInfo(
+                type: .movie,
+                id: dto.movieId,
                 title: dto.title,
-                director: dto.director,
-                posterURL: dto.posterURL,
-                price: dto.price,
+                artist: dto.artist,
+                imageURL: dto.imageURL,
                 genre: dto.genre,
+                releaseDate: date,
+                durationInSeconds: dto.durationInMillis / 1000
+            )
+            return Movie(
+                mediaInfo: mediaInfo,
                 contentAdvisoryRating: dto.contentAdvisoryRating,
+                price: dto.price,
                 description: dto.description,
-                releaseDate: releaseDate
+                previewURL: dto.previewURL
             )
         }
     }

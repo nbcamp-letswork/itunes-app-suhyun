@@ -32,7 +32,7 @@ final class HomeViewModel: ViewModelProtocol {
     }
 
     let action = PublishSubject<Action>()
-    var state = State()
+    fileprivate(set) var state = State()
 
     init(musicUseCase: MusicUseCaseProtocol) {
         self.musicUseCase = musicUseCase

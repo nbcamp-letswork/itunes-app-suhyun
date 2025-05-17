@@ -10,15 +10,20 @@ import Foundation
 
 final class MockRepository: MusicRepositoryProtocol {
     func fetchMusic(keyword: String, country: String, limit: Int) async throws -> [Music] {
+        
         return [
             Music(
-                musicId: 0,
-                title: "mockTitle",
-                artist: "mockArtist",
+                mediaInfo: MediaInfo(
+                    type: .music,
+                    id: 0,
+                    title:  "mockTitle",
+                    artist: "mockArtist",
+                    imageURL: "mockImageURL",
+                    genre: "mockGenre",
+                    releaseDate: Date(),
+                    durationInSeconds: 0
+                ),
                 album: "mockAlbum",
-                imageURL: "mockImageURL",
-                releaseDate: Date(),
-                durationInSeconds: 0
             )
         ]
     }

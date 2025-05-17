@@ -8,10 +8,5 @@
 import Foundation
 
 struct Podcast {
-    let podcastId: Int
-    let title: String
-    let artist: String
-    let imageURL: String
-    let primaryGenre: String
-    let releaseDate: Date
+    let mediaInfo: MediaInfo
 }

@@ -178,7 +178,7 @@ extension HomeSection {
 
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(0.45),
-            heightDimension: .estimated(210)
+            heightDimension: .fractionalWidth(0.55)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -210,27 +210,57 @@ enum HomeItem: Hashable {
     case autumn(MusicItem)
     case winter(MusicItem)
 
+    var music: Music {
+        switch self {
+        case .spring(let musicItem), .summer(let musicItem), .autumn(let musicItem), .winter(let musicItem):
+            return musicItem.toMusic()
+        }
+    }
+
     struct MusicItem: Hashable {
+        let type: MediaType
         let musicId: Int
         let title: String
         let artist: String
         let album: String
+        let genre: String
         let imageURL: String
         let releaseDate: Date
         let durationInSeconds: Int
+        let previewURL: String
     }
 }
 
 extension HomeItem.MusicItem {
     init(from music: Music) {
         self.init(
-            musicId: music.musicId,
-            title: music.title,
-            artist: music.artist,
+            type: music.mediaInfo.type,
+            musicId: music.mediaInfo.id,
+            title: music.mediaInfo.title,
+            artist: music.mediaInfo.artist,
             album: music.album,
-            imageURL: music.imageURL,
-            releaseDate: music.releaseDate,
-            durationInSeconds: music.durationInSeconds
+            genre: music.mediaInfo.genre,
+            imageURL: music.mediaInfo.imageURL,
+            releaseDate: music.mediaInfo.releaseDate,
+            durationInSeconds: music.mediaInfo.durationInSeconds,
+            previewURL: music.previewURL
+        )
+    }
+
+    func toMusic() -> Music {
+        return Music(
+            mediaInfo: MediaInfo(
+                type: type,
+                id: musicId,
+                title: title,
+                artist: artist,
+                imageURL: imageURL,
+                genre: genre,
+                releaseDate: releaseDate,
+                durationInSeconds: durationInSeconds
+            ),
+            album: album,
+            previewURL: previewURL
         )
     }
 }

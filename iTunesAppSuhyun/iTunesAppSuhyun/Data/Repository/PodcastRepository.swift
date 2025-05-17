@@ -20,7 +20,7 @@ final class PodcastRepository: PodcastRepositoryProtocol {
                 keyword: keyword,
                 country: country,
                 limit: limit,
-                media: ITunesMediaType.podcast.media
+                media: MediaType.podcast.media
             )
             return transform(from: result.results)
         } catch {
@@ -33,21 +33,19 @@ final class PodcastRepository: PodcastRepositoryProtocol {
     }
 
     private func transform(from results: [PodcastDTO]) -> [Podcast] {
-        let dateFormatter = ISO8601DateFormatter()
-
         return results.compactMap { dto -> Podcast? in
-            guard let releaseDate = dateFormatter.date(from: dto.releaseDate) else {
-                return nil
-            }
-
-            return Podcast(
-                podcastId: dto.podcastId,
+            guard let date = Date(iso8601String: dto.releaseDate) else{ return nil }
+            let mediaInfo = MediaInfo(
+                type: .podcast,
+                id: dto.podcastId,
                 title: dto.title,
                 artist: dto.artist,
                 imageURL: dto.imageURL,
-                primaryGenre: dto.primaryGenre,
-                releaseDate: releaseDate
+                genre: dto.genre,
+                releaseDate: date,
+                durationInSeconds: dto.durationInMillis / 1000
             )
+            return Podcast(mediaInfo: mediaInfo)
         }
     }
 }

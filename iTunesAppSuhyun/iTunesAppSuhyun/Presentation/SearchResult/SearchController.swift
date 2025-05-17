@@ -59,16 +59,62 @@ final class SearchController: UISearchController {
                 self.dismiss(animated: true)
             }.disposed(by: disposeBag)
 
-        Observable.combineLatest(searchBar.rx.text.orEmpty, searchBar.rx.selectedScopeButtonIndex)
-            .do {[weak self] text, _  in
+
+        searchBar.rx.text.orEmpty
+            .filter { !$0.isEmpty }
+            .do {[weak self] text in
                 self?.searchResultView.configure(title: text)
             }
             .distinctUntilChanged({ $0 == $1 })
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-            .bind { [weak self] text, selectedIndex in
-                guard let type = SearchType(rawValue: selectedIndex) else { return }
+            .withLatestFrom(searchBar.rx.selectedScopeButtonIndex) { text, index in
+                guard let type = SearchType(rawValue: index) else { return (text, .movie) }
+                return (text, type)
+            }
+            .bind { [weak self] text, type in
                 self?.viewModel.action
                     .onNext(.search(keyword: text, type: type))
+            }.disposed(by: disposeBag)
+
+        searchBar.rx.selectedScopeButtonIndex
+            .bind {[weak self] selectedIndex in
+                guard let type = SearchType(rawValue: selectedIndex) else { return }
+                self?.viewModel.action
+                    .onNext(.changedType(type: type))
+            }.disposed(by: disposeBag)
+
+        searchResultView.tableView.rx.itemSelected
+            .withLatestFrom(
+                Observable.combineLatest(
+                    viewModel.state.moiveResult,
+                    viewModel.state.podcastResult,
+                    resultSelector: { movies, podcasts in
+                        return (movies: movies, podcasts: podcasts)
+                    })
+                , resultSelector: { return ($0, $1) }
+            )
+            .throttle(.milliseconds(300), scheduler: MainScheduler.instance)
+            .bind { [weak self] indexPath, items in
+                guard let self else { return }
+                var detailVC: DetailViewController?
+                switch SearchType(rawValue: searchBar.selectedScopeButtonIndex) {
+                case .movie:
+                    let item = items.movies[indexPath.row]
+                    detailVC = DetailViewController(info: DetailInfo(item))
+                case .podcast:
+                    let item = items.podcasts[indexPath.row]
+                    detailVC = DetailViewController(info: DetailInfo(item))
+                case .none:
+                    return
+                }
+                guard let detailVC else { return }
+                detailVC.modalPresentationStyle = .fullScreen
+                self.present(detailVC, animated: true)
+            }.disposed(by: disposeBag)
+
+        self.rx.willPresent
+            .bind {[weak self] in
+                self?.searchBar.showsScopeBar = true
             }.disposed(by: disposeBag)
     }
 
@@ -95,18 +141,10 @@ final class SearchController: UISearchController {
 
 private extension SearchController {
     func configure() {
-        self.delegate = self
         self.obscuresBackgroundDuringPresentation = true
 
         let allCasesTitle = SearchType.allCases.map{ $0.title }
         self.searchBar.placeholder = allCasesTitle.joined(separator: ", ")
         self.searchBar.scopeButtonTitles = allCasesTitle
-    }
-}
-
-
-extension SearchController: UISearchControllerDelegate {
-    func willPresentSearchController(_ searchController: UISearchController) {
-        self.searchBar.showsScopeBar = true
     }
 }
